@@ -16,6 +16,9 @@ for i in *.dat; do
   # roda o plot
   gnuplot ../pareto.plt;
 
+  # crop the PDF edges
+  pdfcrop pareto.pdf pareto.pdf
+  
   # move o PDF pra pasta correta
   mv pareto.pdf ../pdf/$i.pdf;
 done
