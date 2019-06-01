@@ -39,14 +39,18 @@ wilcox.test(obj1$time, obj2$time, paired = TRUE, alternative = "two.sided")
 ############ TABLE 2 ############
 #################################
 
+<<<<<<< HEAD
 data <- read.csv("results.csv", header = TRUE, sep = ",")
+=======
+data <- read.csv("table2.csv", header = TRUE, sep = ",")
+>>>>>>> 97449ee961a1448cf7f2d193eec0903e44ba2072
 sink("table-mbct-2.tex")
 cat("\\toprule \n")
 cat("\\textbf{Size} & \\textbf{Avg. Degree} & \\mc{\\textbf{$|\\mathcal{F}|$}} & \\mc{\\textbf{$|\\mathcal{D}|$}} & \\mc{\\textbf{$M_1$}} & \\mc{\\textbf{$M_2$}} & \\mc{\\textbf{$M_3$}} \\\\ \\midrule \n")
 for (s in c(25,50)) {
   for (d in c(3,5,10)) {
     sub <- subset(data, size == s & degree == d)
-    cat("\\multicolumn{3}{*}{", s, "} &", d, "& ")
+    cat("\\multirow{3}{*}{", s, "} &", d, "& ")
     cat(sprintf("%.2f(%.2f) & %.2f(%.2f) & %.2f(%.2f) & %.2f(%.2f) & %.2f(%.2f) \\\\ \n",
                 mean(sub$exact), sd(sub$exact),
                 mean(sub$npe),   sd(sub$npe),
@@ -56,7 +60,7 @@ for (s in c(25,50)) {
   }
 }
 cat("\\midrule \n")
-cat("\\multirow{2}{c}{\\textbf{Average}} & ")
+cat("\\multicolumn{2}{c}{\\textbf{Average}} & ")
 cat(sprintf("%.2f(%.2f) & %.2f(%.2f) & %.2f(%.2f) & %.2f(%.2f) & %.2f(%.2f) \\\\ \n",
             mean(data$exact), sd(data$exact),
             mean(data$npe), sd(data$npe),
