@@ -39,7 +39,7 @@ wilcox.test(obj1$time, obj2$time, paired = TRUE, alternative = "two.sided")
 ############ TABLE 2 ############
 #################################
 
-data <- read.csv("results/table2.csv", header = TRUE, sep = ",")
+data <- read.csv("results.csv", header = TRUE, sep = ",")
 sink("table-mbct-2.tex")
 cat("\\toprule \n")
 cat("\\textbf{Size} & \\textbf{Avg. Degree} & \\mc{\\textbf{$|\\mathcal{F}|$}} & \\mc{\\textbf{$|\\mathcal{D}|$}} & \\mc{\\textbf{$M_1$}} & \\mc{\\textbf{$M_2$}} & \\mc{\\textbf{$M_3$}} \\\\ \\midrule \n")
@@ -65,3 +65,4 @@ cat(sprintf("%.2f(%.2f) & %.2f(%.2f) & %.2f(%.2f) & %.2f(%.2f) & %.2f(%.2f) \\\\
             mean(data$m3), sd(data$m3)))
 cat("\\bottomrule")
 sink()
+
