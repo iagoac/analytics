@@ -1,0 +1,28 @@
+1 84   # homem
+2 16   # mulher
+3 0
+4 0    # 18-24
+5 37   # 25-34
+6 47   # 35-49
+7 16   # 50-64
+8 1    # 65+
+9 0
+10 0   # <1
+11 10.5  # 1-2
+12 10.5  # 2-3
+13 15.7    # 3-8
+14 26  # 8-16
+15 37  # 16+
+16 0
+17 26  # single
+18 63  # married
+19 5.2 # divorced
+20 5.2 # stable union
+21 0   # others
+22 0
+23 0   # fund. incompleto
+24 0   # medio incompleto
+25 0   # superior incompleto
+26 42  # superior completo
+27     # pos incompleto
+28 58  # pos completo
