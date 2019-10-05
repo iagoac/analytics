@@ -1,4 +1,4 @@
-set terminal pdfcairo size 7,4 font "Times,12" monochrome
+set terminal pdfcairo size 7,4 font "Arial,14" monochrome
 set output 'socioeconomics_consumers.pdf'
 # set output 'socioeconomics_specialists.pdf'
 
