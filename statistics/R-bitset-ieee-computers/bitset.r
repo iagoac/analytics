@@ -1,10 +1,11 @@
 # open files
-setwd("~/Documents/ieee-computers")
+setwd("~/ieee-computers")
 library(PMCMR)
 simd <-  read.csv("iago-simd.csv",  header = TRUE, sep = ",")
 mcore <- read.csv("iago-mcore.csv", header = TRUE, sep = ",")
 dist  <- read.csv("iago-dist.csv",  header = TRUE, sep = ",")
 batch <- read.csv("iago-batch.csv", header = TRUE, sep = ",")
+cache <- read.csv("iago-cache.csv", header = TRUE, sep = ",")
 gray  <- read.csv("iago-gray.csv",  header = TRUE, sep = ",")
 order <- read.csv("iago-order.csv", header = TRUE, sep = ",")
 watch <- read.csv("iago-watch.csv", header = TRUE, sep = ",")
@@ -80,7 +81,22 @@ posthoc.friedman.nemenyi.test(as.matrix(df))
 remove(df, dist, dist_1, dist_2, dist_4, dist_8, dist_16, i)
 
 # experiment 4 -- memory-reduction
+# plot of the first graphic
 for (b in unique(as.list(batch$bitset.size))) {
   s <- subset(batch, bitset.size == b & complete == "1")
-  cat(b, " ", nrow(s), " ", mean(s$time), "\n")
+  cat(b, " ", nrow(s), mean(s$time), mean(s$max.memory)*(10^-5), "\n")
 }
+
+# tests the memory reduction
+zero <- subset(batch, bitset.size == "0")
+best <- subset(batch, bitset.size == "19")
+df <- data.frame(zero$complete, zero$sum.memory, best$complete, best$sum.memory)
+df <- subset(df, zero.complete == "1")
+
+mean(df$best.sum.memory)/mean(df$zero.sum.memory)*100
+wilcox.test(df$best.sum.memory, df$zero.sum.memory)
+remove(batch,df, zero, best,s,b)
+
+# experiment 5 -- cache
+cache_enabled  <- subset(cache, has.cache == "1" & complete == "1")
+cache_disabled <- subset(cache, has.cache == "0" & complete == "1")
