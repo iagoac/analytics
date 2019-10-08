@@ -94,9 +94,23 @@ df <- data.frame(zero$complete, zero$sum.memory, best$complete, best$sum.memory)
 df <- subset(df, zero.complete == "1")
 
 mean(df$best.sum.memory)/mean(df$zero.sum.memory)*100
-wilcox.test(df$best.sum.memory, df$zero.sum.memory)
+wilcox.test(df$best.sum.memory, df$zero.sum.memory, paired = TRUE)
 remove(batch,df, zero, best,s,b)
 
-# experiment 5 -- cache
+# experiment 5.1 -- cache
 cache_enabled  <- subset(cache, has.cache == "1" & complete == "1")
-cache_disabled <- subset(cache, has.cache == "0" & complete == "1")
+cache_disabled <- subset(cache, has.cache == "0"  & complete == "1")
+df <- data.frame(cache_disabled$complete, cache_enabled$time, cache_disabled$time)
+df <- subset(df, cache_disabled.complete == "1")
+wilcox.test(df$cache_disabled.time, df$cache_enabled.time, paired = TRUE)
+mean(df$cache_disabled.time) / mean(df$cache_enabled.time)
+remove(cache_enabled, cache_disabled, cache, df)
+
+# experiment 5.2 -- gray-code
+gray_enabled  <- subset(gray, has.gray.code == "1" & complete == "1")
+gray_disabled <- subset(gray, has.gray.code == "0" & complete == "1")
+df <- data.frame(gray_disabled$complete, gray_enabled$time, gray_disabled$time)
+df <- subset(df, gray_disabled.complete == "1")
+wilcox.test(df$gray_disabled.time, df$gray_enabled.time, paired = TRUE)
+mean(df$gray_disabled.time) / mean(df$gray_enabled.time)
+remove(gray, gray_enabled, gray_disabled, df)
