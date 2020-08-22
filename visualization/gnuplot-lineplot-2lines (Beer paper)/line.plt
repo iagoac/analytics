@@ -4,11 +4,10 @@ set output 'socioeconomics_consumers.pdf'
 
 set key outside top right spacing 2
 
-set xlabel 'Beer'
 set ylabel 'Have previously used the preferred beer glass (%)'
 
 set xrange[0.8:5.2]
-set xtics 1 nomirror
+set xtics("Draft beer" 1, "Weizen" 2, "Lager" 3, "Red Ale" 4, "Dunkel Weizen" 5)
 
 set yrange [80:102]
 set ytics 4 nomirror

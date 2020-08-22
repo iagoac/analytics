@@ -5,27 +5,23 @@ karasan   <- read.csv("karasan_sorted.csv",   header = TRUE, sep = ",")
 
 catanzaroMILP_t <- subset(catanzaro, algorithm == "exact")
 catanzaroVND_t  <- subset(catanzaro, algorithm == "vnd")
-catanzaroLP_t   <- subset(catanzaro, algorithm == "faolp")
-catanzaroSP_t   <- subset(catanzaro, algorithm == "faosp")
+catanzaroSBA_t   <- subset(catanzaro, algorithm == "faoamu")
 catanzaroLR_t   <- subset(catanzaro, algorithm == "faolr")
 
 
 karasanMILP_t <- subset(karasan, algorithm == "exact")
 karasanVND_t  <- subset(karasan, algorithm == "vnd")
-karasanLP_t   <- subset(karasan, algorithm == "faolp")
-karasanSP_t   <- subset(karasan, algorithm == "faosp")
+karasanSBA_t   <- subset(karasan, algorithm == "faoamu")
 karasanLR_t   <- subset(karasan, algorithm == "faolr")
 
 catanzaroMILP <- subset(catanzaroMILP_t)
 catanzaroVND  <- subset(catanzaroVND_t)
-catanzaroLP   <- subset(catanzaroLP_t)
-catanzaroSP   <- subset(catanzaroSP_t)
+catanzaroSBA   <- subset(catanzaroSBA_t)
 catanzaroLR   <- subset(catanzaroLR_t)
 
 karasanMILP <- subset(karasanMILP_t)
 karasanVND  <- subset(karasanVND_t)
-karasanSP   <- subset(karasanSP_t)
-karasanLP   <- subset(karasanLP_t)
+karasanSBA   <- subset(karasanSBA_t)
 karasanLR   <- subset(karasanLR_t)
 
 best <- as.data.frame(matrix(0, nrow=nrow(karasanMILP_t), ncol=2))
@@ -43,67 +39,55 @@ colnames(best) <- c("catanzaro", "karasan")
 for (i in 1:nrow(catanzaroMILP_t)) {
   best$catanzaro[i] <- min(catanzaroMILP_t$primal[i], 
                            catanzaroVND_t$primal[i], 
-                           catanzaroSP_t$primal[i], 
-                           catanzaroLP_t$primal[i],
+                           catanzaroSBA_t$primal[i], 
                            catanzaroLR_t$primal[i])
   
   best$karasan[i] <- min(karasanMILP_t$primal[i], 
                          karasanVND_t$primal[i], 
-                         karasanSP_t$primal[i], 
-                         karasanLP_t$primal[i],
+                         karasanSBA_t$primal[i], 
                          karasanLR_t$primal[i])
-  
-#  if (karasanMILP$primal[i] == best$karasan[i]) {
-#    k_milp <- k_milp + 1
-#  }
-  
-#  if (karasanVND$primal[i] == best$karasan[i]) {
-#    k_vnd <- k_vnd + 1
-#  }
-  
-#  if (karasanSP$primal[i] == best$karasan[i]) {
-#    k_sp <- k_sp + 1
-#  }
-  
-#  if (karasanLP$primal[i] == best$karasan[i]) {
-#    k_lp <- k_lp + 1
-#  }
-  
-#  if (catanzaroMILP$primal[i] == best$catanzaro[i]) {
-#    c_milp <- c_milp + 1
-#  }
-  
-#  if (catanzaroVND$primal[i] == best$catanzaro[i]) {
-#    c_vnd <- c_vnd + 1
-#  }
-  
-#  if (catanzaroSP$primal[i] == best$catanzaro[i]) {
-#    c_sp <- c_sp + 1
-#  }
-  
-#  if (catanzaroLP$primal[i] == best$catanzaro[i]) {
-#    c_lp <- c_lp + 1
-#  }
 }
 
-for (i in (1+nrow(catanzaroMILP_t)):nrow(catanzaroLP_t)) {
-  best$catanzaro[i] <- min(catanzaroSP_t$primal[i], 
-                           catanzaroLP_t$primal[i],
+
+a <- subset(karasanSBA_t,  size == 200 & layers == 5)
+b <- subset(karasanLR_t,   size == 200 & layers == 5)
+c <- subset(karasanMILP_t, size == 200 & layers == 5)
+d <- subset(karasanVND_t,  size == 200 & layers == 5)
+e <- a
+
+
+for (i in 1:nrow(a)) {
+  e$primal[i] <- min(a$primal[i], b$primal[i], c$primal[i], d$primal[i])
+  a$gap[i] = 100*((a$primal[i]-e$primal[i])/e$primal[i])
+  b$gap[i] = 100*((b$primal[i]-e$primal[i])/e$primal[i])
+  d$gap[i] = 100*((d$primal[i]-e$primal[i])/e$primal[i])
+}
+
+mean(a$gap)
+sd(a$gap)
+mean(b$gap)
+sd(b$gap)
+mean(d$gap)
+sd(d$gap)
+
+
+
+for (i in (1+nrow(catanzaroMILP_t)):nrow(catanzaroLR_t)) {
+    best$catanzaro[i] <- min(catanzaroSBA_t$primal[i], 
+                           catanzaroMILP_t$primal[i],
+                           catanzaroVND_t$primal[i],
                            catanzaroLR_t$primal[i])
   
   best$karasan[i] <- min(karasanMILP_t$primal[i], 
                          karasanVND_t$primal[i], 
-                         karasanSP_t$primal[i], 
-                         karasanLP_t$primal[i],
+                         karasanSBA_t$primal[i], 
                          karasanLR_t$primal[i])
 }
 
-for (i in (1+nrow(catanzaroLP_t)):nrow(karasanMILP_t)) {
-  best$catanzaro[i] <- 1
+for (i in (1+nrow(catanzaroLR_t)):nrow(karasanMILP_t)) {
+  best$catanzaro[i] <- catanzaroSBA_t$primal[i]
   best$karasan[i] <- min(karasanMILP_t$primal[i], 
                          karasanVND_t$primal[i], 
-                         karasanSP_t$primal[i], 
-                         karasanLP_t$primal[i],
                          karasanLR_t$primal[i])
 }
 
@@ -113,13 +97,11 @@ for (i in (1+nrow(catanzaroLP_t)):nrow(karasanMILP_t)) {
 # average
 # cat((k_milp+c_milp)/480*100, "&", (k_vnd+c_vnd)/480*100, "&", (k_sp+c_sp)/480*100, "&", (k_lp+c_lp)/480*100)
 
-catanzaroSP_t$gap = 100*((catanzaroSP_t$primal-best$catanzaro[1:165])/best$catanzaro[1:165])
-catanzaroLP_t$gap = 100*((catanzaroLP_t$primal-best$catanzaro[1:165])/best$catanzaro[1:165])
+catanzaroSBA_t$gap = 100*((catanzaroSBA_t$primal-best$catanzaro)/best$catanzaro)
 catanzaroLR_t$gap = 100*((catanzaroLR_t$primal-best$catanzaro[1:165])/best$catanzaro[1:165])
 catanzaroVND_t$gap = 100*((catanzaroVND_t$primal-best$catanzaro[1:135])/best$catanzaro[1:135])
 
-karasanSP_t$gap = 100*((karasanSP_t$primal-best$karasan)/best$karasan)
-karasanLP_t$gap = 100*((karasanLP_t$primal-best$karasan)/best$karasan)
+karasanSBA_t$gap = 100*((karasanSBA_t$primal-best$karasan)/best$karasan)
 karasanLR_t$gap = 100*((karasanLR_t$primal-best$karasan)/best$karasan)
 karasanVND_t$gap = 100*((karasanVND_t$primal-best$karasan)/best$karasan)
 
@@ -195,7 +177,7 @@ sink()
 
 
 
-# Tabela heurísticas catanzaro
+# Tabela heuristicas catanzaro
 sink("randomHeuristics.tex", append = FALSE)
 cat("\\begin{table}[!t] \n")
 cat("\\caption{Results for the heuristics on random digraphs} \n")
@@ -209,24 +191,19 @@ for (tamanho in unique(as.list(catanzaroMILP_t$size))) {
   cat("\\multirow{4}{*}{", tamanho, "}")
   for (d in unique(as.list(catanzaroMILP_t$D))) {  
     cat(" &", d, "& ")
-    subSP  <- subset(catanzaroSP_t,  size == tamanho & D == d)
-    subLP  <- subset(catanzaroLP_t,  size == tamanho & D == d)
+    subSBA  <- subset(catanzaroSBA_t,  size == tamanho & D == d)
     subVND <- subset(catanzaroVND_t, size == tamanho & D == d)
     subLR  <- subset(catanzaroLR_t,  size == tamanho & D == d)
     
-    cat(sprintf("%.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) \\\\ \n", 
+    cat(sprintf("%.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) \\\\ \n", 
+                mean(subSBA$gap), 
+                sd  (subSBA$gap),
+                mean(subSBA$time), 
+                sd  (subSBA$time),
                 mean(subVND$gap), 
                 sd  (subVND$gap),
                 mean(subVND$time), 
                 sd  (subVND$time), 
-                mean(subSP$gap), 
-                sd  (subSP$gap),
-                mean(subSP$time), 
-                sd  (subSP$time),
-                mean(subLP$gap), 
-                sd  (subLP$gap),
-                mean(subLP$time), 
-                sd  (subLP$time),
                 mean(subLR$gap), 
                 sd  (subLR$gap),
                 mean(subLR$time), 
@@ -234,16 +211,6 @@ for (tamanho in unique(as.list(catanzaroMILP_t$size))) {
   }
   cat("\\midrule\n")
 }
-cat("\\multicolumn{2}{l}{\\textbf{Average}} &")
-cat(sprintf("%.1f & %.1f & %.1f & %.1f & %.1f & %.1f \\\\ \n", 
-            mean(catanzaroVND_t$gap), 
-            mean(catanzaroVND_t$time), 
-            mean(catanzaroSP_t$gap), 
-            mean(catanzaroSP_t$time),
-            mean(catanzaroLP_t$gap), 
-            mean(catanzaroLP_t$time)))
-
-cat("\\bottomrule \n")
 cat("\\end{tabular}% \n}\n")
 cat("\\end{table} \n")
 sink()
@@ -260,49 +227,42 @@ cat("\\caption{Results for the heuristics on layered digraphs} \n")
 cat("\\label{table:layeredHeuristics} \n")
 cat("\\resizebox{\\textwidth}{!}{% \n")
 cat("\\begin{tabular}{cccccccc} \n")
-cat("\\toprule \n")
-cat("            &             &  \\multicolumn{2}{c}{VND~\\cite{Carvalho2018}} & \\multicolumn{2}{c}{$F\\&O_{sp}$}  & \\multicolumn{2}{c}{$F\\&O_{lp}$} \\\\ \\cmidrule(lr){3-4} \\cmidrule(lr){5-6} \\cmidrule(lr){7-8}\n")
+cat("            &             &  \\multicolumn{2}{c}{VND~\\cite{Carvalho2018}} & \\multicolumn{2}{c}{$FO-SBA$}  & \\multicolumn{2}{c}{$F\\&O_{lp}$} \\\\ \\cmidrule(lr){3-4} \\cmidrule(lr){5-6} \\cmidrule(lr){7-8}\n")
 cat("$|N|$ & $\\omega$ & \\mc{dev (\\%)} & \\mc{t (s)} & \\mc{dev (\\%)} & \\mc{t (s)} & \\mc{dev (\\%)} & \\mc{t (s)} \\\\ \\midrule \n")
 for (tamanho in unique(as.list(karasanMILP_t$size))) {
   cat("\\multirow{4}{*}{", tamanho, "}")
   for (l in unique(as.list(karasanMILP_t$layers))) {
     cat(" &", l, "&")
 
-    subSP  <- subset(karasanSP_t,  size == tamanho & layers == l)
-    subLP  <- subset(karasanLP_t,  size == tamanho & layers == l)
-    subVND <- subset(karasanVND_t, size == tamanho & layers == l)
+    subSP  <- subset(karasanSBA_t,  size == tamanho & layers == l)
     subLR  <- subset(karasanLR_t,  size == tamanho & layers == l)
     
-    cat(sprintf("%.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) & %.1f(%.1f) \\\\ \n", 
-                mean(subVND$gap), 
-                sd  (subVND$gap),
-                mean(subVND$time), 
-                sd  (subVND$time), 
+    cat(sprintf("%.1f(%.1f) & %.1f(%.1f) \\\\ \n", 
+                #mean(subVND$gap), 
+                #sd  (subVND$gap),
+                #mean(subVND$time), 
+                #sd  (subVND$time), 
                 mean(subSP$gap), 
                 sd  (subSP$gap),
                 mean(subSP$time), 
-                sd  (subSP$time),
-                mean(subLP$gap), 
-                sd  (subLP$gap),
-                mean(subLP$time), 
-                sd  (subLP$time),
-                mean(subLR$gap), 
-                sd  (subLR$gap),
-                mean(subLR$time), 
-                sd  (subLR$time)))
+                sd  (subSP$time)))
+                #mean(subLR$gap), 
+                #sd  (subLR$gap),
+                #mean(subLR$time), 
+                #sd  (subLR$time)))
   }
   cat("\\midrule\n")
 }
-cat("\\multicolumn{2}{l}{\\textbf{Average}} &")
-cat(sprintf("\\mc{%.1f} & \\mc{%.1f} & \\mc{%.1f} & \\mc{%.1f} & \\mc{%.1f} & \\mc{%.1f} \\\\ \n", 
-            mean(karasanVND_t$gap), 
-            mean(karasanVND_t$time), 
-            mean(karasanSP_t$gap), 
-            mean(karasanSP_t$time),
-            mean(karasanLP_t$gap), 
-            mean(karasanLP_t$time)))
+# cat("\\multicolumn{2}{l}{\\textbf{Average}} &")
+# cat(sprintf("\\mc{%.1f} & \\mc{%.1f} & \\mc{%.1f} & \\mc{%.1f} & \\mc{%.1f} & \\mc{%.1f} \\\\ \n", 
+#            mean(karasanVND_t$gap), 
+#            mean(karasanVND_t$time), 
+#            mean(karasanSP_t$gap), 
+#            mean(karasanSP_t$time),
+#            mean(karasanLP_t$gap), 
+#            mean(karasanLP_t$time)))
 
-cat("\\bottomrule \n")
+#cat("\\bottomrule \n")
 cat("\\end{tabular}% \n}\n")
 cat("\\end{table} \n")
 sink()
@@ -320,12 +280,12 @@ cat("\\begin{tabular}{rcccccccccc} \n")
 cat("\\toprule \n")
 cat("     &   &       & \\multicolumn{4}{c}{$F\\&O_{sp}$} & \\multicolumn{4}{c}{$F\\&O_{lp}$} \\\\ \\cmidrule(lr){4-7} \\cmidrule(lr){8-11} \n")
 cat("Size & D & $|A|$ & $|A'|$ & R (\\%) & t_p (s) & t_t (s) & $|A'|$ & R (\\%) & t_p (s) & t_t (s)  \\\\  \\midrule \n")
-for (nodes in unique(as.list(catanzaroSP_t$size))) {
+for (nodes in unique(as.list(catanzaroSBA_t$size))) {
   cat("\\multirow{4}{*}{", nodes, "}")
-  for (d in unique(as.list(catanzaroSP_t$D))) {
+  for (d in unique(as.list(catanzaroSBA_t$D))) {
     cat("&", d, "& ")
     total_arcs <- nodes*(nodes-1) * (d/100);
-    sub <- subset(catanzaroSP_t, size == nodes & D == d)
+    sub <- subset(catanzaroSBA_t, size == nodes & D == d)
     cat(sprintf("%.1f(%.1f) & %.1f & %.1f(%.1f) & %.1f(%.1f) &", 
                 mean(sub$arcs),
                 sd(sub$arcs), 
@@ -348,16 +308,6 @@ for (nodes in unique(as.list(catanzaroSP_t$size))) {
   }
   cat("\\midrule\n")
 }
-
-cat("\\multicolumn{4}{l}{\\textbf{Average}} &")
-# for (variation in unique(as.list(catanzaroDBH$interval))) {
-#  sub <- subset(catanzaroDBH, interval == variation)
-#  cat(sprintf(" & %.1f & %.1f &", 
-#              mean(sub$timePP),
-#              mean(sub$timeTotal)))
-#}
-cat("\\\\ \n")
-cat("\\bottomrule \n")
 cat("\\end{tabular}% \n}\n")
 cat("\\end{table} \n")
 sink()
@@ -373,12 +323,12 @@ cat("\\begin{tabular}{rcccccccccc} \n")
 cat("\\toprule \n")
 cat("     &   &       & \\multicolumn{4}{c}{$F\\&O_{sp}$} & \\multicolumn{4}{c}{$F\\&O_{lp}$} \\\\ \\cmidrule(lr){4-7} \\cmidrule(lr){8-11} \n")
 cat("Size & $\\omega$ & $|A|$ & $|A'|$ & \\mc{R (\\%)} & \\mc{$t_p$ (s)} & \\mc{$t_t$ (s)} & $|A'|$ & \\mc{R (\\%)} & \\mc{$t_p$ (s)} & \\mc{$t_t$ (s)}  \\\\  \\midrule \n")
-for (nodes in unique(as.list(karasanSP_t$size))) {
+for (nodes in unique(as.list(karasanSBA_t$size))) {
   cat("\\multirow{4}{*}{", nodes, "}")
-  for (l in unique(as.list(karasanSP_t$layers))) {
+  for (l in unique(as.list(karasanSBA_t$layers))) {
     cat("&", l, "& ")
     total_arcs <- ((nodes/l)-1)*(l*l)+2*l
-    sub <- subset(karasanSP_t, size == nodes & layers == l)
+    sub <- subset(karasanSBA_t, size == nodes & layers == l)
     cat(sprintf("& %.1f(%.1f) & %.1f & %.1f(%.1f) & %.1f(%.1f) &", 
                 mean(sub$arcs),
                 sd(sub$arcs), 
@@ -414,11 +364,11 @@ karasanLR_t[166:180,]$gap <- 9999
 karasanVND_t[136:180,]$gap <- 9999
 
 df <- data.frame(matrix(ncol = 3, nrow = 180))
-x <- c("vnd", "faosp", "faolr")
+x <- c("vnd", "faosba", "faolr")
 colnames(df) <- x
 
 df$vnd   <- karasanVND_t$gap
-df$faosp <- karasanSP_t$gap
+df$faosba <- karasanSBA_t$gap
 df$faolr <- karasanLR_t$gap
 
 friedman.test(as.matrix(df))
@@ -436,7 +386,7 @@ dunn.test(x=list(karasanVND_t$gap,   karasanSP_t$gap,   karasanLR_t$gap),   list
 
 dunn.test(df, label = TRUE)
 
-a <- posthoc.friedman.nemenyi.test(as.matrix(df))
+posthoc.friedman.nemenyi.test(as.matrix(df))
 
 df$vnd <- karasanVND_t$gap
 df$faosp <- karasanSP_t$gap

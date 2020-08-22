@@ -1,4 +1,4 @@
-setwd("~/anor2")
+setwd("C:/github/analytics/statistics/R-latex-tables-anor-biobjective-trees")
 
 hop1   <- read.csv("hop/cost/results.csv",    header = TRUE, sep = ",")
 hop2   <- read.csv("hop/hop/results.csv",     header = TRUE, sep = ",")
@@ -8,7 +8,7 @@ delay2 <- read.csv("delay/delay/results.csv", header = TRUE, sep = ",")
 sink("hc-results.tex", append = FALSE)
 cat("\\begin{table}[!t] \n")
 cat("\\caption{Comparison of the two $aug\\,\\epsilon\\text{-}CM$ implementations for B-HCMST}\n")
-cat("\\label{table:hc\_results} \n")
+cat("\\label{table:hc_results} \n")
 cat("\\centering \n")
 cat("\\begin{tabular}{\n  c\n  c\n  c\n  c\n  c\n  c\n}\n")
 cat("\\toprule \n")
@@ -33,6 +33,7 @@ for (t in unique(as.list(hop1$type))) {
 cat("\\bottomrule \n")
 cat("\\end{tabular} \n")
 cat("\\end{table} \n")
+remove(s, t, sub1, sub2)
 sink()
 
 
@@ -40,7 +41,7 @@ sink()
 sink("dc-results.tex", append = FALSE)
 cat("\\begin{table}[!t] \n")
 cat("\\caption{Comparison of the two $aug\\,\\epsilon\\text{-}CM$ implementations for B-DCMST}\n")
-cat("\\label{table:hc_results} \n")
+cat("\\label{table:dc_results} \n")
 cat("\\centering \n")
 cat("\\begin{tabular}{\n  c\n  c\n  c\n  c\n  c\n  c\n}\n")
 cat("\\toprule \n")
@@ -65,4 +66,23 @@ for (t in unique(as.list(delay1$type))) {
 cat("\\bottomrule \n")
 cat("\\end{tabular} \n")
 cat("\\end{table} \n")
+remove(s, t, sub1, sub2)
 sink()
+
+# normality tests
+shapiro.test(subset(delay1, type == "tc")$time)
+shapiro.test(subset(delay1, type == "te")$time)
+shapiro.test(subset(delay2, type == "tc")$time)
+shapiro.test(subset(delay2, type == "te")$time)
+shapiro.test(subset(hop1,   type == "tc")$time)
+shapiro.test(subset(hop1,   type == "te")$time)
+shapiro.test(subset(hop2,   type == "tc")$time)
+shapiro.test(subset(hop2,   type == "te")$time)
+
+
+# paired wilcoxon's tests
+wilcox.test(subset(hop1, type == "tc")$time, subset(hop2, type == "tc")$time, paired = TRUE, alternative = "two.sided")
+wilcox.test(subset(hop1, type == "te")$time, subset(hop2, type == "te")$time, paired = TRUE, alternative = "two.sided")
+
+wilcox.test(subset(delay1, type == "tc")$time, subset(delay2, type == "tc")$time, paired = TRUE, alternative = "two.sided")
+wilcox.test(subset(delay1, type == "te")$time, subset(delay2, type == "te")$time, paired = TRUE, alternative = "two.sided")
