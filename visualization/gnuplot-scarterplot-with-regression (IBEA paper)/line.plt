@@ -20,6 +20,9 @@ set yrange [0:1]
 f(x) = m*x + b
 fit f(x) "data.dat" using 1:2 via m,b
 
+# Computing the statistics for the regression line
+stats 'data.dat' using 1:2 name "A"
+
 plot  "data.dat" using 1:2 with points ls 1 pointtype 7 pi -1 ps 2 lc rgb '#00000000', f(x) lc rgb '#000'
 
 set output # finish the current output file

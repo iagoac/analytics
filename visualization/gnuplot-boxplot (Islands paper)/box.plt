@@ -17,12 +17,20 @@ set xlabel '$m$'
 set xrange[1:51]
 
 # set grid ytics lc rgb 'grey90'
-# set yrange[0:25]
-set log y
-set ytics 20, 10, 50000 logscale
+set yrange[0:30]
+# set log y
+# set ytics 20, 10, 50000 logscale
 set ylabel 'Deviation from optimal'
 
-plot for [i=1:49] "times.dat" using (i+1):i lt 1 pointtype 7
+f(x) = m*x + b
+fit f(x) "regression.dat" using 1:2 via m,b
+
+# Computing the statistics for the regression line
+stats 'regression.dat' using 1:2 name "A"
+
+# plot  "regression.dat" using 1:2 with points ls 1 pointtype 7 pi -1 ps 2 lc rgb '#00000000', f(x) lc rgb '#000'
+
+# plot for [i=1:49] "times.dat" using (i+1):i lt 1 pointtype 7
 
 unset output
 
